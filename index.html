@@ -7,9 +7,18 @@
 
 <script>
 
-const AIRTABLE_TOKEN = "poner token aqui";
+function obtenerTokenDeURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("token");
+}
+
+const AIRTABLE_TOKEN = obtenerTokenDeURL();
 const AIRTABLE_BASE_ID = "appXSUQpwjYjXHi8A";
 const AIRTABLE_TABLE = "tblPeCx0LHnyeDuNE";
+
+if (!AIRTABLE_TOKEN) {
+  document.body.innerHTML = "<p style='color:red;font-family:sans-serif;padding:20px;'>Falta el token. Abre esta página con ?token=TU_TOKEN al final de la URL.</p>";
+}
 
 function cargarRegistros() {
 
@@ -67,7 +76,7 @@ function pintarTabla(records) {
 
     fila.innerHTML =
       "<td>" + enlaceVerRegistro + "</td>" +
-     "<td style='text-align:center;'><a href='" + (f.Ubicacion || "#") + "' style='display:inline-block;padding:8px 16px;background-color:#3d7d84;color:#ffffff;text-decoration:none;border-radius:20px;border:none;font-family:sans-serif;font-size:13px;font-weight:bold;white-space:nowrap;'>➔ Cómo llegar</a></td>" +
+      "<td style='text-align:center;'><a href='" + (f.Ubicacion || "#") + "' style='display:inline-block;padding:8px 16px;background-color:#3d7d84;color:#ffffff;text-decoration:none;border-radius:20px;border:none;font-family:sans-serif;font-size:13px;font-weight:bold;white-space:nowrap;'>➔ Cómo llegar</a></td>" +
       "<td>" + (f.Telefono || "") + "</td>" +
       "<td>" + (f.Contacto || "") + "</td>";
 
@@ -242,7 +251,9 @@ function guardarRegistro(id) {
   });
 }
 
-cargarRegistros();
+if (AIRTABLE_TOKEN) {
+  cargarRegistros();
+}
 
 </script>
 
