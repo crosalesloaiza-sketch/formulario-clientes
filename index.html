@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+
+<script>
+
+const AIRTABLE_TOKEN = "poner token aqui";
+const AIRTABLE_BASE_ID = "appXSUQpwjYjXHi8A";
+const AIRTABLE_TABLE = "tblPeCx0LHnyeDuNE";
+
+function cargarRegistros() {
+
+  const url = "https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE +
+    "?sort%5B0%5D%5Bfield%5D=Nombre&sort%5B0%5D%5Bdirection%5D=asc";
+
+  fetch(url, {
+    method: "GET",
+    headers: {
+      "Authorization": "Bearer " + AIRTABLE_TOKEN
+    }
+  })
+  .then(function(response) {
+    if (!response.ok) {
+      throw new Error("Error HTTP " + response.status);
+    }
+    return response.json();
+  })
+  .then(function(data) {
+    pintarTabla(data.records);
+  })
+  .catch(function(error) {
+    document.body.innerHTML = "<p style='color:red;font-family:sans-serif;padding:20px;'>Error al cargar: " + error.message + "</p>";
+  });
+}
+
+function pintarTabla(records) {
+
+  document.body.innerHTML =
+    "<table id='tabla' border='1' style='border-collapse:collapse;width:100%;font-family:sans-serif;'>" +
+    "<tr><th>Nombre</th><th>Ubicación</th><th>Teléfono</th><th>Contacto</th></tr>" +
+    "</table>" +
+    "<div style='margin-top:15px;text-align:right;'>" +
+    "<a href='#' onclick='mostrarFormulario();return false;' style='display:inline-block;padding:6px 12px;background-color:#000000;color:white;text-decoration:none;border-radius:4px;font-family:sans-serif;font-size:14px;'>+ Agregar</a>" +
+    "</div>";
+
+  const tabla = document.getElementById("tabla");
+
+  records.forEach(function(record) {
+
+    const f = record.fields;
+    const id = record.id;
+
+    const fila = document.createElement("tr");
+
+    const enlaceVerRegistro =
+      "<a href='#' onclick='verRegistro(\"" + id + "\",\"" +
+      (f.Nombre || "").replace(/"/g, "&quot;") + "\",\"" +
+      (f.Contacto || "").replace(/"/g, "&quot;") + "\",\"" +
+      (f.Telefono || "").replace(/"/g, "&quot;") + "\",\"" +
+      (f.Ubicacion || "").replace(/"/g, "&quot;") +
+      "\");return false;' style='text-decoration:none;color:inherit;'>" +
+      (f.Nombre || "") +
+      "</a>";
+
+    fila.innerHTML =
+      "<td>" + enlaceVerRegistro + "</td>" +
+     "<td style='text-align:center;'><a href='" + (f.Ubicacion || "#") + "' style='display:inline-block;padding:8px 16px;background-color:#3d7d84;color:#ffffff;text-decoration:none;border-radius:20px;border:none;font-family:sans-serif;font-size:13px;font-weight:bold;white-space:nowrap;'>➔ Cómo llegar</a></td>" +
+      "<td>" + (f.Telefono || "") + "</td>" +
+      "<td>" + (f.Contacto || "") + "</td>";
+
+    tabla.appendChild(fila);
+  });
+}
+
+function verRegistro(id, nombre, contacto, telefono, ubicacion) {
+
+  document.body.innerHTML =
+    "<div style='font-family:sans-serif;padding:20px;'>" +
+
+    "<h2>" + nombre + "</h2>" +
+
+    "<p><strong>Contacto:</strong> " + contacto + "</p>" +
+    "<p><strong>Teléfono:</strong> " + telefono + "</p>" +
+    "<p><strong>Ubicación:</strong> " + ubicacion + "</p>" +
+
+    "<button id='btnEditar' style='margin-top:20px;padding:10px 18px;background:#2980b9;color:white;border:0;border-radius:5px;font-size:15px;'>Editar</button>" +
+    " " +
+    "<button id='btnEliminar' style='margin-top:20px;padding:10px 18px;background:#c0392b;color:white;border:0;border-radius:5px;font-size:15px;'>Eliminar</button>" +
+    " " +
+    "<button id='btnVolver' style='margin-top:20px;padding:10px 18px;background:#555;color:white;border:0;border-radius:5px;font-size:15px;'>Volver</button>" +
+
+    "<p id='estado' style='margin-top:15px;color:#555;'></p>" +
+
+    "</div>";
+
+  document.getElementById("btnEditar").addEventListener("click", function() {
+    mostrarFormulario(id, nombre, contacto, telefono, ubicacion);
+  });
+
+  document.getElementById("btnEliminar").addEventListener("click", function() {
+    confirmarEliminar(id, nombre);
+  });
+
+  document.getElementById("btnVolver").addEventListener("click", function() {
+    cargarRegistros();
+  });
+}
+
+function confirmarEliminar(id, nombre) {
+
+  document.body.innerHTML =
+    "<div style='font-family:sans-serif;padding:20px;'>" +
+
+    "<h2>¿Eliminar este registro?</h2>" +
+
+    "<p>" + nombre + "</p>" +
+
+    "<button id='btnConfirmar' style='margin-top:20px;padding:10px 18px;background:#c0392b;color:white;border:0;border-radius:5px;font-size:15px;'>Sí, eliminar</button>" +
+    " " +
+    "<button id='btnCancelar' style='margin-top:20px;padding:10px 18px;background:#555;color:white;border:0;border-radius:5px;font-size:15px;'>Cancelar</button>" +
+
+    "<p id='estado' style='margin-top:15px;color:#555;'></p>" +
+
+    "</div>";
+
+  document.getElementById("btnConfirmar").addEventListener("click", function() {
+    eliminarRegistro(id);
+  });
+
+  document.getElementById("btnCancelar").addEventListener("click", function() {
+    cargarRegistros();
+  });
+}
+
+function eliminarRegistro(id) {
+
+  const estado = document.getElementById("estado");
+  estado.textContent = "Eliminando...";
+
+  fetch("https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE + "/" + id, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Bearer " + AIRTABLE_TOKEN
+    }
+  })
+  .then(function(response) {
+    if (!response.ok) {
+      throw new Error("Error HTTP " + response.status);
+    }
+    return response.json();
+  })
+  .then(function(data) {
+    cargarRegistros();
+  })
+  .catch(function(error) {
+    estado.textContent = "Error al eliminar: " + error.message;
+  });
+}
+
+function mostrarFormulario(id, nombre, contacto, telefono, ubicacion) {
+
+  const esEdicion = !!id;
+
+  document.body.innerHTML =
+    "<div style='font-family:sans-serif;padding:20px;'>" +
+
+    "<h2>" + (esEdicion ? "Editar registro" : "Agregar registro") + "</h2>" +
+
+    "<label>Nombre</label><br>" +
+    "<input id='nombre' type='text' value='" + (nombre || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 15px;font-size:16px;'>" +
+
+    "<label>Contacto</label><br>" +
+    "<input id='contacto' type='text' value='" + (contacto || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 15px;font-size:16px;'>" +
+
+    "<label>Número de teléfono</label><br>" +
+    "<input id='telefono' type='text' value='" + (telefono || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 15px;font-size:16px;'>" +
+
+    "<label>Ubicación</label><br>" +
+    "<input id='ubicacion' type='text' value='" + (ubicacion || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 20px;font-size:16px;'>" +
+
+    "<button id='btnGuardar' style='padding:10px 18px;background:#000;color:white;border:0;border-radius:5px;font-size:15px;'>Guardar</button>" +
+    " " +
+    "<button id='btnCancelar' style='padding:10px 18px;background:#555;color:white;border:0;border-radius:5px;font-size:15px;'>Cancelar</button>" +
+
+    "<p id='estado' style='margin-top:15px;color:#555;'></p>" +
+
+    "</div>";
+
+  document.getElementById("btnGuardar").addEventListener("click", function() {
+    guardarRegistro(id);
+  });
+
+  document.getElementById("btnCancelar").addEventListener("click", function() {
+    cargarRegistros();
+  });
+}
+
+function guardarRegistro(id) {
+
+  const nombre = document.getElementById("nombre").value;
+  const contacto = document.getElementById("contacto").value;
+  const telefono = document.getElementById("telefono").value;
+  const ubicacion = document.getElementById("ubicacion").value;
+
+  const estado = document.getElementById("estado");
+  estado.textContent = "Guardando...";
+
+  const url = "https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE +
+    (id ? "/" + id : "");
+
+  const metodo = id ? "PATCH" : "POST";
+
+  fetch(url, {
+    method: metodo,
+    headers: {
+      "Authorization": "Bearer " + AIRTABLE_TOKEN,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      fields: {
+        Nombre: nombre,
+        Contacto: contacto,
+        Telefono: telefono,
+        Ubicacion: ubicacion
+      }
+    })
+  })
+  .then(function(response) {
+    if (!response.ok) {
+      throw new Error("Error HTTP " + response.status);
+    }
+    return response.json();
+  })
+  .then(function(data) {
+    cargarRegistros();
+  })
+  .catch(function(error) {
+    estado.textContent = "Error al guardar: " + error.message;
+  });
+}
+
+cargarRegistros();
+
+</script>
+
+</body>
+</html>
