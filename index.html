@@ -7,29 +7,12 @@
 
 <script>
 
-function obtenerTokenDeURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("token");
-}
-
-const AIRTABLE_TOKEN = obtenerTokenDeURL();
-const AIRTABLE_BASE_ID = "appXSUQpwjYjXHi8A";
-const AIRTABLE_TABLE = "tblPeCx0LHnyeDuNE";
-
-if (!AIRTABLE_TOKEN) {
-  document.body.innerHTML = "<p style='color:red;font-family:sans-serif;padding:20px;'>Falta el token. Abre esta página con ?token=TU_TOKEN al final de la URL.</p>";
-}
+const WORKER_URL = "https://airtable-proxy.crosalesloaiza.workers.dev";
 
 function cargarRegistros() {
 
-  const url = "https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE +
-    "?sort%5B0%5D%5Bfield%5D=Nombre&sort%5B0%5D%5Bdirection%5D=asc";
-
-  fetch(url, {
-    method: "GET",
-    headers: {
-      "Authorization": "Bearer " + AIRTABLE_TOKEN
-    }
+  fetch(WORKER_URL, {
+    method: "GET"
   })
   .then(function(response) {
     if (!response.ok) {
@@ -149,11 +132,8 @@ function eliminarRegistro(id) {
   const estado = document.getElementById("estado");
   estado.textContent = "Eliminando...";
 
-  fetch("https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE + "/" + id, {
-    method: "DELETE",
-    headers: {
-      "Authorization": "Bearer " + AIRTABLE_TOKEN
-    }
+  fetch(WORKER_URL + "?id=" + id, {
+    method: "DELETE"
   })
   .then(function(response) {
     if (!response.ok) {
@@ -217,15 +197,12 @@ function guardarRegistro(id) {
   const estado = document.getElementById("estado");
   estado.textContent = "Guardando...";
 
-  const url = "https://api.airtable.com/v0/" + AIRTABLE_BASE_ID + "/" + AIRTABLE_TABLE +
-    (id ? "/" + id : "");
-
+  const url = id ? WORKER_URL + "?id=" + id : WORKER_URL;
   const metodo = id ? "PATCH" : "POST";
 
   fetch(url, {
     method: metodo,
     headers: {
-      "Authorization": "Bearer " + AIRTABLE_TOKEN,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -251,9 +228,7 @@ function guardarRegistro(id) {
   });
 }
 
-if (AIRTABLE_TOKEN) {
-  cargarRegistros();
-}
+cargarRegistros();
 
 </script>
 
