@@ -1,15 +1,253 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<title>Registro de Clientes — Pinturas Protecto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root {
+    --ink: #1C2321;
+    --ink-soft: #4A5450;
+    --paper: #F7F5F0;
+    --panel: #FFFFFF;
+    --line: #DDD9CE;
+    --rust: #B4532A;
+    --rust-deep: #8C3D1E;
+    --moss: #5C6B4F;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    padding: 40px 32px 80px;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--rust-deep);
+    letter-spacing: 0.02em;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    margin: 4px 0 0;
+    letter-spacing: -0.01em;
+  }
+
+  .count {
+    font-size: 14px;
+    color: var(--ink-soft);
+    text-align: right;
+  }
+  .count strong { color: var(--ink); font-size: 20px; display: block; font-family: 'Space Grotesk', sans-serif; }
+
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+    align-items: center;
+  }
+
+  .search {
+    flex: 1;
+    position: relative;
+  }
+  .search input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    background: var(--panel);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .search input:focus { outline: none; border-color: var(--rust); }
+  .search::before {
+    content: "";
+    position: absolute;
+    left: 13px; top: 50%;
+    width: 14px; height: 14px;
+    transform: translateY(-50%);
+    background: var(--ink-soft);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='black' stroke-width='2'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65' stroke='black' stroke-width='2'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='black' stroke-width='2'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65' stroke='black' stroke-width='2'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  .btn-add {
+    background: var(--rust);
+    color: white;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+  }
+  .btn-add:hover { background: var(--rust-deep); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+  }
+
+  thead th {
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    font-size: 14.5px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover { background: #FBF9F4; }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .nombre-link {
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nombre-link:hover { color: var(--rust-deep); }
+
+  .telefono { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+
+  .ir {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #EEF1E9;
+    color: var(--moss);
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+  .ir:hover { background: var(--moss); color: white; transform: scale(1.06); }
+  .ir svg { width: 17px; height: 17px; display: block; }
+
+  .estado-msg {
+    padding: 40px;
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .estado-msg.error { color: var(--rust-deep); }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 28px 32px;
+    max-width: 480px;
+  }
+  .panel h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    margin: 0 0 18px;
+  }
+  .panel p { margin: 6px 0; font-size: 14.5px; }
+  .panel p strong { color: var(--ink-soft); font-weight: 500; }
+
+  .panel label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+    margin-top: 14px;
+  }
+  .panel input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .panel input:focus { outline: none; border-color: var(--rust); }
+
+  .btn-row { margin-top: 22px; display: flex; gap: 10px; }
+  .btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .btn-primary { background: var(--ink); color: white; }
+  .btn-danger { background: var(--rust-deep); color: white; }
+  .btn-neutral { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); }
+
+  .estado-inline { margin-top: 14px; font-size: 13.5px; color: var(--ink-soft); }
+</style>
 </head>
 <body>
+
+<div class="wrap" id="app">
+  <div class="estado-msg">Cargando registros…</div>
+</div>
 
 <script>
 
 const WORKER_URL = "https://airtable-proxy.crosalesloaiza.workers.dev";
+const app = document.getElementById("app");
+
+function escapar(texto) {
+  return (texto || "").toString().replace(/"/g, "&quot;");
+}
+
+function encabezado(subtitulo) {
+  return `
+    <header>
+      <div>
+        <div class="brand">PINTURAS PROTECTO · AKZONOBEL</div>
+        <h1>${subtitulo}</h1>
+      </div>
+    </header>
+  `;
+}
 
 function cargarRegistros() {
+
+  app.innerHTML = encabezado("Registro de clientes") + '<div class="estado-msg">Cargando registros…</div>';
 
   fetch(WORKER_URL, {
     method: "GET"
@@ -24,69 +262,87 @@ function cargarRegistros() {
     pintarTabla(data.records);
   })
   .catch(function(error) {
-    document.body.innerHTML = "<p style='color:red;font-family:sans-serif;padding:20px;'>Error al cargar: " + error.message + "</p>";
+    app.innerHTML = encabezado("Registro de clientes") +
+      '<div class="estado-msg error">Error al cargar: ' + error.message + '</div>';
   });
 }
 
 function pintarTabla(records) {
 
-  document.body.innerHTML =
-    "<table id='tabla' border='1' style='border-collapse:collapse;width:100%;font-family:sans-serif;'>" +
-    "<tr><th>Nombre</th><th>Ubicación</th><th>Teléfono</th><th>Contacto</th></tr>" +
-    "</table>" +
-    "<div style='margin-top:15px;text-align:right;'>" +
-    "<a href='#' onclick='mostrarFormulario();return false;' style='display:inline-block;padding:6px 12px;background-color:#000000;color:white;text-decoration:none;border-radius:4px;font-family:sans-serif;font-size:14px;'>+ Agregar</a>" +
-    "</div>";
-
-  const tabla = document.getElementById("tabla");
+  let filas = "";
 
   records.forEach(function(record) {
-
     const f = record.fields;
     const id = record.id;
 
-    const fila = document.createElement("tr");
+    filas += `
+      <tr>
+        <td>
+          <a class="nombre-link" href="#" onclick='verRegistro("${id}","${escapar(f.Nombre)}","${escapar(f.Contacto)}","${escapar(f.Telefono)}","${escapar(f.Ubicacion)}");return false;'>
+            ${f.Nombre || ""}
+          </a>
+        </td>
+        <td>
+          <a class="ir" href="${f.Ubicacion || '#'}" title="Cómo llegar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </a>
+        </td>
+        <td class="telefono">${f.Telefono || ""}</td>
+        <td>${f.Contacto || ""}</td>
+      </tr>
+    `;
+  });
 
-    const enlaceVerRegistro =
-      "<a href='#' onclick='verRegistro(\"" + id + "\",\"" +
-      (f.Nombre || "").replace(/"/g, "&quot;") + "\",\"" +
-      (f.Contacto || "").replace(/"/g, "&quot;") + "\",\"" +
-      (f.Telefono || "").replace(/"/g, "&quot;") + "\",\"" +
-      (f.Ubicacion || "").replace(/"/g, "&quot;") +
-      "\");return false;' style='text-decoration:none;color:inherit;'>" +
-      (f.Nombre || "") +
-      "</a>";
+  app.innerHTML = encabezado("Registro de clientes") + `
+    <div class="toolbar">
+      <div class="search">
+        <input type="text" id="buscador" placeholder="Buscar por nombre, contacto o teléfono…" oninput="filtrarTabla()">
+      </div>
+      <button class="btn-add" onclick="mostrarFormulario()">+ Agregar cliente</button>
+    </div>
 
-    fila.innerHTML =
-      "<td>" + enlaceVerRegistro + "</td>" +
-      "<td style='text-align:center;'><a href='" + (f.Ubicacion || "#") + "' style='display:inline-block;padding:8px 16px;background-color:#3d7d84;color:#ffffff;text-decoration:none;border-radius:20px;border:none;font-family:sans-serif;font-size:13px;font-weight:bold;white-space:nowrap;'>➔ Cómo llegar</a></td>" +
-      "<td>" + (f.Telefono || "") + "</td>" +
-      "<td>" + (f.Contacto || "") + "</td>";
+    <table id="tabla">
+      <thead>
+        <tr>
+          <th style="width:28%">Empresa</th>
+          <th style="width:16%">Ubicación</th>
+          <th style="width:18%">Teléfono</th>
+          <th style="width:28%">Contacto</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filas}
+      </tbody>
+    </table>
+  `;
+}
 
-    tabla.appendChild(fila);
+function filtrarTabla() {
+  const q = document.getElementById("buscador").value.toLowerCase();
+  const filas = document.querySelectorAll("#tabla tbody tr");
+  filas.forEach(function(fila) {
+    const texto = fila.textContent.toLowerCase();
+    fila.style.display = texto.includes(q) ? "" : "none";
   });
 }
 
 function verRegistro(id, nombre, contacto, telefono, ubicacion) {
 
-  document.body.innerHTML =
-    "<div style='font-family:sans-serif;padding:20px;'>" +
+  app.innerHTML = encabezado("Detalle del cliente") + `
+    <div class="panel">
+      <h2>${nombre}</h2>
+      <p><strong>Contacto:</strong> ${contacto}</p>
+      <p><strong>Teléfono:</strong> ${telefono}</p>
+      <p><strong>Ubicación:</strong> ${ubicacion}</p>
 
-    "<h2>" + nombre + "</h2>" +
-
-    "<p><strong>Contacto:</strong> " + contacto + "</p>" +
-    "<p><strong>Teléfono:</strong> " + telefono + "</p>" +
-    "<p><strong>Ubicación:</strong> " + ubicacion + "</p>" +
-
-    "<button id='btnEditar' style='margin-top:20px;padding:10px 18px;background:#2980b9;color:white;border:0;border-radius:5px;font-size:15px;'>Editar</button>" +
-    " " +
-    "<button id='btnEliminar' style='margin-top:20px;padding:10px 18px;background:#c0392b;color:white;border:0;border-radius:5px;font-size:15px;'>Eliminar</button>" +
-    " " +
-    "<button id='btnVolver' style='margin-top:20px;padding:10px 18px;background:#555;color:white;border:0;border-radius:5px;font-size:15px;'>Volver</button>" +
-
-    "<p id='estado' style='margin-top:15px;color:#555;'></p>" +
-
-    "</div>";
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnEditar">Editar</button>
+        <button class="btn btn-danger" id="btnEliminar">Eliminar</button>
+        <button class="btn btn-neutral" id="btnVolver">Volver</button>
+      </div>
+      <p class="estado-inline" id="estado"></p>
+    </div>
+  `;
 
   document.getElementById("btnEditar").addEventListener("click", function() {
     mostrarFormulario(id, nombre, contacto, telefono, ubicacion);
@@ -103,20 +359,18 @@ function verRegistro(id, nombre, contacto, telefono, ubicacion) {
 
 function confirmarEliminar(id, nombre) {
 
-  document.body.innerHTML =
-    "<div style='font-family:sans-serif;padding:20px;'>" +
+  app.innerHTML = encabezado("Eliminar registro") + `
+    <div class="panel">
+      <h2>¿Eliminar este registro?</h2>
+      <p>${nombre}</p>
 
-    "<h2>¿Eliminar este registro?</h2>" +
-
-    "<p>" + nombre + "</p>" +
-
-    "<button id='btnConfirmar' style='margin-top:20px;padding:10px 18px;background:#c0392b;color:white;border:0;border-radius:5px;font-size:15px;'>Sí, eliminar</button>" +
-    " " +
-    "<button id='btnCancelar' style='margin-top:20px;padding:10px 18px;background:#555;color:white;border:0;border-radius:5px;font-size:15px;'>Cancelar</button>" +
-
-    "<p id='estado' style='margin-top:15px;color:#555;'></p>" +
-
-    "</div>";
+      <div class="btn-row">
+        <button class="btn btn-danger" id="btnConfirmar">Sí, eliminar</button>
+        <button class="btn btn-neutral" id="btnCancelar">Cancelar</button>
+      </div>
+      <p class="estado-inline" id="estado"></p>
+    </div>
+  `;
 
   document.getElementById("btnConfirmar").addEventListener("click", function() {
     eliminarRegistro(id);
@@ -153,30 +407,27 @@ function mostrarFormulario(id, nombre, contacto, telefono, ubicacion) {
 
   const esEdicion = !!id;
 
-  document.body.innerHTML =
-    "<div style='font-family:sans-serif;padding:20px;'>" +
+  app.innerHTML = encabezado(esEdicion ? "Editar registro" : "Agregar registro") + `
+    <div class="panel">
+      <label>Nombre</label>
+      <input id="nombre" type="text" value="${escapar(nombre)}">
 
-    "<h2>" + (esEdicion ? "Editar registro" : "Agregar registro") + "</h2>" +
+      <label>Contacto</label>
+      <input id="contacto" type="text" value="${escapar(contacto)}">
 
-    "<label>Nombre</label><br>" +
-    "<input id='nombre' type='text' value='" + (nombre || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 15px;font-size:16px;'>" +
+      <label>Número de teléfono</label>
+      <input id="telefono" type="text" value="${escapar(telefono)}">
 
-    "<label>Contacto</label><br>" +
-    "<input id='contacto' type='text' value='" + (contacto || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 15px;font-size:16px;'>" +
+      <label>Ubicación</label>
+      <input id="ubicacion" type="text" value="${escapar(ubicacion)}">
 
-    "<label>Número de teléfono</label><br>" +
-    "<input id='telefono' type='text' value='" + (telefono || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 15px;font-size:16px;'>" +
-
-    "<label>Ubicación</label><br>" +
-    "<input id='ubicacion' type='text' value='" + (ubicacion || "") + "' style='width:100%;box-sizing:border-box;padding:10px;margin:5px 0 20px;font-size:16px;'>" +
-
-    "<button id='btnGuardar' style='padding:10px 18px;background:#000;color:white;border:0;border-radius:5px;font-size:15px;'>Guardar</button>" +
-    " " +
-    "<button id='btnCancelar' style='padding:10px 18px;background:#555;color:white;border:0;border-radius:5px;font-size:15px;'>Cancelar</button>" +
-
-    "<p id='estado' style='margin-top:15px;color:#555;'></p>" +
-
-    "</div>";
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnGuardar">Guardar</button>
+        <button class="btn btn-neutral" id="btnCancelar">Cancelar</button>
+      </div>
+      <p class="estado-inline" id="estado"></p>
+    </div>
+  `;
 
   document.getElementById("btnGuardar").addEventListener("click", function() {
     guardarRegistro(id);
