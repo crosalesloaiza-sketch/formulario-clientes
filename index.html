@@ -2,486 +2,535 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Registro de Clientes — Pinturas Protecto</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Clientes</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+  :root{
+    color-scheme:light;
+    --fondo:#EEF2F5;
+    --papel:#FFFFFF;
+    --tinta:#17262F;
+    --suave:#5B6B76;
+    --linea:#D9E1E7;
+    --azul:#1B5E7B;
+    --azul-claro:#DCEBF2;
+    --verde:#2A7A4B;
+    --verde-claro:#DDF0E4;
+    --rojo:#B3261E;
+    --rojo-claro:#FBE4E2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--fondo);color:var(--tinta);min-height:100vh;
+  }
+  body.bloqueado{overflow:hidden}
+  body.bloqueado .app,body.bloqueado .fab{visibility:hidden}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:110px}
+  header{
+    position:sticky;top:0;z-index:2;background:var(--fondo);
+    padding:18px 16px 10px;border-bottom:1px solid var(--linea);
+  }
+  h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
+  .cuenta{font-size:14px;color:var(--suave);margin-top:2px}
+  .buscador{
+    margin-top:12px;display:flex;align-items:center;gap:10px;
+    background:var(--papel);border:1px solid var(--linea);border-radius:12px;
+    padding:0 12px;height:46px;
+  }
+  .buscador:focus-within{border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro)}
+  .buscador svg{flex:none;color:var(--suave)}
+  .buscador input{flex:1;border:0;outline:0;background:transparent;font-size:16px;color:var(--tinta);height:100%}
+  .filtros{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  .filtros::-webkit-scrollbar{display:none}
+  .filtros button{
+    flex:none;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);
+    font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;
+  }
+  .filtros button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}
+  button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
 
-  :root {
-    --ink: #1C2321;
-    --ink-soft: #4A5450;
-    --paper: #F7F5F0;
-    --panel: #FFFFFF;
-    --line: #DDD9CE;
-    --rust: #B4532A;
-    --rust-deep: #8C3D1E;
-    --moss: #5C6B4F;
+  ul{list-style:none;background:var(--papel)}
+  li{display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--linea)}
+  .datos{
+    flex:1;min-width:0;text-align:left;background:none;border:0;font-family:inherit;color:inherit;
+    padding:14px 0;cursor:pointer;
+  }
+  .empresa{font-size:17px;font-weight:650;line-height:1.25}
+  .contacto{font-size:14px;color:var(--suave);margin-top:2px}
+  .telefono{font-size:14px;margin-top:2px;font-variant-numeric:tabular-nums}
+  .acciones{display:flex;gap:10px;flex:none}
+  .acciones a,.acciones span{
+    width:46px;height:46px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;text-decoration:none;
+  }
+  .llamar{background-color:#DDF0E4;color:#2A7A4B}
+  .mapa{background-color:#DCEBF2;color:#1B5E7B}
+  .apagado{background-color:#EEF0F2;color:#A3ADB5}
+
+  .estado{padding:32px 16px;text-align:center;color:var(--suave);background:var(--papel)}
+  .estado.error{background:var(--rojo-claro);color:var(--rojo);text-align:left}
+  .estado.error strong{display:block;margin-bottom:6px}
+  .estado button{
+    margin-top:14px;height:44px;padding:0 20px;border-radius:12px;border:0;
+    background:var(--azul);color:#fff;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;
   }
 
-  * { box-sizing: border-box; }
-
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: 'Inter', sans-serif;
-    padding: 40px 32px 80px;
+  /* Botón flotante */
+  .fab{
+    position:fixed;bottom:24px;
+    right:max(20px, calc(50% - 240px + 20px));
+    -webkit-appearance:none;appearance:none;
+    width:60px;height:60px;border-radius:50%;border:0;
+    background-color:#1B5E7B;color:#FFFFFF;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 16px rgba(23,38,47,.28);z-index:3;
   }
+  .fab:active{transform:scale(.95)}
 
-  .wrap { max-width: 1080px; margin: 0 auto; }
+  /* Cuadro para agregar y editar */
+  .velo{
+    position:fixed;top:0;left:0;right:0;bottom:0;background:#EEF2F5;z-index:10;
+    display:none;overflow:auto;-webkit-overflow-scrolling:touch;
+  }
+  .velo.abierto{display:block}
+  .cuadro{
+    background:#FFFFFF;width:100%;max-width:480px;min-height:100%;margin:0 auto;
+    padding:20px 16px 40px;
+  }
+  .cuadro-cab{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .cuadro h2{font-size:20px;font-weight:700}
+  .cerrar{
+    -webkit-appearance:none;appearance:none;
+    width:40px;height:40px;border-radius:50%;border:0;background-color:#EEF2F5;
+    color:#17262F;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .campo{margin-top:12px}
+  .campo label{display:block;font-size:14px;color:var(--suave);margin-bottom:6px}
+  .campo input,.campo select{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:48px;border:1px solid #D9E1E7;border-radius:12px;
+    padding:0 12px;font-size:16px;font-family:inherit;color:#17262F;background-color:#FFFFFF;
+  }
+  .campo select{
+    padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235B6B76' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
+  }
+  .campo input:focus,.campo select:focus{outline:0;border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro)}
+  .ayuda{font-size:13px;color:var(--suave);margin-top:6px}
+  .msg-error{
+    margin-top:14px;padding:12px;border-radius:12px;background:var(--rojo-claro);
+    color:var(--rojo);font-size:14px;display:none;
+  }
+  .guardar{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:50px;margin-top:18px;border-radius:12px;border:0;
+    background-color:#1B5E7B;color:#FFFFFF;font-size:16px;font-weight:650;font-family:inherit;cursor:pointer;
+  }
+  .guardar:disabled{opacity:.6;cursor:default}
+  .eliminar{
+    -webkit-appearance:none;appearance:none;
+    width:100%;height:50px;margin-top:12px;border-radius:12px;border:0;
+    background-color:#FBE4E2;color:#B3261E;font-size:16px;font-weight:650;font-family:inherit;cursor:pointer;
+  }
+  .confirmar{display:none;margin-top:18px;padding:16px;border-radius:12px;background-color:#FBE4E2}
+  .confirmar p{font-size:16px;color:#B3261E;font-weight:600;line-height:1.35}
+  .confirmar .ayuda{color:#B3261E;font-weight:400;margin-top:6px}
+  .confirmar .fila-botones{display:flex;gap:10px;margin-top:14px}
+  .confirmar button{
+    -webkit-appearance:none;appearance:none;
+    flex:1;height:50px;border-radius:12px;border:0;font-size:16px;font-weight:650;
+    font-family:inherit;cursor:pointer;
+  }
+  .confirmar .btn-cancelar{background-color:#FFFFFF;color:#17262F;border:1px solid #D9E1E7}
+  .confirmar .btn-si{background-color:#B3261E;color:#FFFFFF}
+  .confirmar button:disabled{opacity:.6;cursor:default}
 
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    border-bottom: 3px solid var(--ink);
-    padding-bottom: 20px;
-    margin-bottom: 28px;
+  .aviso{
+    position:fixed;left:50%;bottom:100px;transform:translateX(-50%);
+    background:var(--tinta);color:#fff;font-size:15px;padding:12px 18px;border-radius:12px;
+    opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90%;text-align:center;
   }
-
-  .brand {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 500;
-    font-size: 13px;
-    color: var(--rust-deep);
-    letter-spacing: 0.02em;
-  }
-
-  h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 34px;
-    margin: 4px 0 0;
-    letter-spacing: -0.01em;
-  }
-
-  .count {
-    font-size: 14px;
-    color: var(--ink-soft);
-    text-align: right;
-  }
-  .count strong { color: var(--ink); font-size: 20px; display: block; font-family: 'Space Grotesk', sans-serif; }
-
-  .toolbar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 18px;
-    align-items: center;
-  }
-
-  .search {
-    flex: 1;
-    position: relative;
-  }
-  .search input {
-    width: 100%;
-    padding: 11px 14px 11px 38px;
-    border: 1.5px solid var(--line);
-    border-radius: 4px;
-    background: var(--panel);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    color: var(--ink);
-  }
-  .search input:focus { outline: none; border-color: var(--rust); }
-  .search::before {
-    content: "";
-    position: absolute;
-    left: 13px; top: 50%;
-    width: 14px; height: 14px;
-    transform: translateY(-50%);
-    background: var(--ink-soft);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='black' stroke-width='2'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65' stroke='black' stroke-width='2'/%3E%3C/svg%3E") center/contain no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='7' fill='none' stroke='black' stroke-width='2'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65' stroke='black' stroke-width='2'/%3E%3C/svg%3E") center/contain no-repeat;
-  }
-
-  .btn-add {
-    background: var(--rust);
-    color: white;
-    border: none;
-    padding: 11px 20px;
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s ease;
-  }
-  .btn-add:hover { background: var(--rust-deep); }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--panel);
-    border: 1px solid var(--line);
-  }
-
-  thead th {
-    text-align: left;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 12.5px;
-    color: var(--ink-soft);
-    padding: 12px 16px;
-    border-bottom: 2px solid var(--ink);
-  }
-
-  tbody td {
-    padding: 13px 16px;
-    font-size: 14.5px;
-    border-bottom: 1px solid var(--line);
-    vertical-align: middle;
-  }
-
-  tbody tr:hover { background: #FBF9F4; }
-  tbody tr:last-child td { border-bottom: none; }
-
-  .nombre-link {
-    font-weight: 600;
-    color: var(--ink);
-    text-decoration: none;
-  }
-  .nombre-link:hover { color: var(--rust-deep); }
-
-  .telefono { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
-
-  .ir {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #EEF1E9;
-    color: var(--moss);
-    text-decoration: none;
-    transition: background 0.15s ease, transform 0.15s ease;
-  }
-  .ir:hover { background: var(--moss); color: white; transform: scale(1.06); }
-  .ir svg { width: 17px; height: 17px; display: block; }
-
-  .estado-msg {
-    padding: 40px;
-    text-align: center;
-    color: var(--ink-soft);
-    font-size: 14px;
-  }
-  .estado-msg.error { color: var(--rust-deep); }
-
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 28px 32px;
-    max-width: 480px;
-  }
-  .panel h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 22px;
-    margin: 0 0 18px;
-  }
-  .panel p { margin: 6px 0; font-size: 14.5px; }
-  .panel p strong { color: var(--ink-soft); font-weight: 500; }
-
-  .panel label {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--ink-soft);
-    margin-bottom: 5px;
-    margin-top: 14px;
-  }
-  .panel input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--line);
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-size: 14.5px;
-    color: var(--ink);
-  }
-  .panel input:focus { outline: none; border-color: var(--rust); }
-
-  .btn-row { margin-top: 22px; display: flex; gap: 10px; }
-  .btn {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  .btn-primary { background: var(--ink); color: white; }
-  .btn-danger { background: var(--rust-deep); color: white; }
-  .btn-neutral { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); }
-
-  .estado-inline { margin-top: 14px; font-size: 13.5px; color: var(--ink-soft); }
+  .aviso.visible{opacity:1}
+  @media (prefers-reduced-motion:reduce){.aviso{transition:none}}
 </style>
 </head>
 <body>
+<div class="app">
+  <header>
+    <h1>Clientes</h1>
+    <p class="cuenta" id="cuenta">Cargando…</p>
+    <label class="buscador">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Buscar empresa, contacto o teléfono" autocomplete="off" aria-label="Buscar cliente">
+    </label>
+    <div class="filtros" id="filtros"></div>
+  </header>
 
-<div class="wrap" id="app">
-  <div class="estado-msg">Cargando registros…</div>
+  <ul id="lista"></ul>
+  <div class="estado" id="estado">Cargando clientes…</div>
 </div>
 
+<button class="fab" id="nuevo" aria-label="Agregar cliente">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<div class="velo" id="velo">
+  <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="titulo">
+    <div class="cuadro-cab">
+      <h2 id="titulo">Nuevo cliente</h2>
+      <button type="button" class="cerrar" id="cerrar" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form id="form" novalidate>
+      <div class="campo"><label for="f-empresa">Empresa</label><input id="f-empresa" autocomplete="off"></div>
+      <div class="campo"><label for="f-contacto">Contacto</label><input id="f-contacto" autocomplete="off"></div>
+      <div class="campo"><label for="f-tel">Teléfono</label><input id="f-tel" type="tel" inputmode="tel" autocomplete="off"></div>
+      <div class="campo">
+        <label for="f-mapa">Ubicación (enlace de Google Maps)</label>
+        <input id="f-mapa" type="url" inputmode="url" placeholder="Pega aquí el enlace" autocomplete="off">
+        <p class="ayuda">En Google Maps toca Compartir, luego Copiar enlace.</p>
+      </div>
+      <div class="campo">
+        <label for="f-zona">Zona</label>
+        <select id="f-zona"></select>
+      </div>
+      <div class="msg-error" id="msg-error" role="alert"></div>
+      <button type="submit" class="guardar" id="guardar">Guardar cliente</button>
+      <button type="button" class="eliminar" id="eliminar">Eliminar cliente</button>
+    </form>
+    <div class="confirmar" id="confirmar">
+      <p id="confirmar-texto"></p>
+      <p class="ayuda">Esta acción no se puede deshacer.</p>
+      <div class="msg-error" id="error-eliminar" role="alert"></div>
+      <div class="fila-botones">
+        <button type="button" class="btn-cancelar" id="no-eliminar">Cancelar</button>
+        <button type="button" class="btn-si" id="si-eliminar">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" role="status"></div>
+
 <script>
+  // ── Configuración ────────────────────────────────────────────
+  // URL de tu Worker. No lleva token: el Worker lo agrega desde sus secretos.
+  const API   = "https://airtable-proxy.crosalesloaiza.workers.dev";
+  // Nombres de los campos en Airtable (deben coincidir exactamente)
+  const CAMPO = {empresa:"Nombre", contacto:"Contacto", tel:"Telefono", mapa:"Ubicacion", zona:"Zona"};
+  // Opciones de Zona (deben ser iguales a las de Airtable, con tildes)
+  const ZONAS = ["San José","Alajuela","Cartago","Heredia","Guanacaste","Puntarenas","Limón"];
+  // ─────────────────────────────────────────────────────────────
 
-const WORKER_URL = "https://airtable-proxy.crosalesloaiza.workers.dev";
-const app = document.getElementById("app");
+  let clientes = [];
+  let zonaActiva = "Todos";
+  let editandoId = null;   // null = agregando; con valor = editando ese registro
 
-function escapar(texto) {
-  return (texto || "").toString().replace(/"/g, "&quot;");
-}
+  const $ = id => document.getElementById(id);
+  const lista=$("lista"), cuenta=$("cuenta"), estado=$("estado"), q=$("q"), filtros=$("filtros");
+  const velo=$("velo"), form=$("form"), msgError=$("msg-error"), guardarBtn=$("guardar");
 
-function encabezado(subtitulo) {
-  return `
-    <header>
-      <div>
-        <div class="brand">PINTURAS PROTECTO · AKZONOBEL</div>
-        <h1>${subtitulo}</h1>
-      </div>
-    </header>
-  `;
-}
+  const iconoTel = c => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
+  const iconoMapa = c => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
 
-function cargarRegistros() {
+  const norm = t => String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const esc = t => String(t||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-  app.innerHTML = encabezado("Registro de clientes") + '<div class="estado-msg">Cargando registros…</div>';
+  function enlaceTel(t){
+    const d = String(t||"").replace(/\D/g,"");
+    if(!d) return "";
+    if(d.length === 8) return "tel:+506" + d;
+    return "tel:+" + d;
+  }
 
-  fetch(WORKER_URL, {
-    method: "GET"
-  })
-  .then(function(response) {
-    if (!response.ok) {
-      throw new Error("Error HTTP " + response.status);
+  function convertir(rec){
+    return {
+      id: rec.id,
+      empresa: rec.fields[CAMPO.empresa] || "",
+      contacto: rec.fields[CAMPO.contacto] || "",
+      tel: rec.fields[CAMPO.tel] || "",
+      mapa: rec.fields[CAMPO.mapa] || "",
+      zona: rec.fields[CAMPO.zona] || ""
+    };
+  }
+  const ordenar = () => clientes.sort((a,b)=>a.empresa.localeCompare(b.empresa,"es"));
+
+  // Texto claro según el tipo de error
+  function textoError(e, accion){
+    if(e && e.status === 401) return "La conexión con la base no está autorizada. Revisa el token en el Worker.";
+    if(e && e.status === 403) return accion === "guardar"
+      ? "No hay permiso para escribir en la base. Revisa los permisos del token en Airtable."
+      : "No hay permiso para leer la base. Revisa los permisos del token en Airtable.";
+    if(e && e.status === 404) return accion === "guardar"
+      ? "No se encontró el registro. Puede que ese cliente ya no exista en Airtable."
+      : "No se encontró la base o la tabla. Revisa el ID de la base y el nombre de la tabla en el Worker.";
+    if(e && e.status === 422) return "Airtable no aceptó algún dato." + (e.detalle ? " " + e.detalle : "");
+    if(e && e.status === 429) return "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.";
+    if(e && e.status) return "El servidor respondió con un error (" + e.status + ").";
+    return "No se pudo conectar. Revisa tu conexión a internet y la URL del Worker.";
+  }
+
+  async function leerError(r){
+    let detalle = "";
+    try{ const j = await r.json(); detalle = (j.error && (j.error.message || j.error.type)) || ""; }catch(_){}
+    return {status:r.status, detalle};
+  }
+
+  // ── Cargar ───────────────────────────────────────────────────
+  async function cargar(){
+    estado.className = "estado";
+    estado.style.display = "block";
+    estado.textContent = "Cargando clientes…";
+    let todos = [];
+    let offset = "";
+    try{
+      do{
+        const r = await fetch(API + "?pageSize=100" + (offset ? "&offset=" + encodeURIComponent(offset) : ""));
+        if(!r.ok) throw await leerError(r);
+        const j = await r.json();
+        todos = todos.concat(j.records);
+        offset = j.offset || "";
+      }while(offset);
+    }catch(e){
+      estado.className = "estado error";
+      estado.innerHTML = `<strong>No se pudieron cargar los clientes</strong>${esc(textoError(e,"leer"))}<br><button id="reintentar">Reintentar</button>`;
+      $("reintentar").onclick = cargar;
+      cuenta.textContent = "Sin datos";
+      lista.innerHTML = "";
+      return;
     }
-    return response.json();
-  })
-  .then(function(data) {
-    pintarTabla(data.records);
-  })
-  .catch(function(error) {
-    app.innerHTML = encabezado("Registro de clientes") +
-      '<div class="estado-msg error">Error al cargar: ' + error.message + '</div>';
-  });
-}
+    clientes = todos.map(convertir);
+    ordenar();
+    estado.style.display = "none";
+    pintarFiltros();
+    pintar();
+  }
 
-function pintarTabla(records) {
+  // ── Pintar ───────────────────────────────────────────────────
+  function pintarFiltros(){
+    const zonas = ["Todos", ...new Set(clientes.map(c=>c.zona).filter(Boolean))];
+    if(!zonas.includes(zonaActiva)) zonaActiva = "Todos";
+    filtros.innerHTML = zonas.map(z=>`<button aria-pressed="${z===zonaActiva}" data-z="${esc(z)}">${esc(z)}</button>`).join("");
+  }
 
-  let filas = "";
-
-  records.forEach(function(record) {
-    const f = record.fields;
-    const id = record.id;
-
-    filas += `
-      <tr>
-        <td>
-          <a class="nombre-link" href="#" onclick='verRegistro("${id}","${escapar(f.Nombre)}","${escapar(f.Contacto)}","${escapar(f.Telefono)}","${escapar(f.Ubicacion)}");return false;'>
-            ${f.Nombre || ""}
-          </a>
-        </td>
-        <td>
-          <a class="ir" href="${f.Ubicacion || '#'}" title="Cómo llegar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          </a>
-        </td>
-        <td class="telefono">${f.Telefono || ""}</td>
-        <td>${f.Contacto || ""}</td>
-      </tr>
-    `;
-  });
-
-  app.innerHTML = encabezado("Registro de clientes") + `
-    <div class="toolbar">
-      <div class="search">
-        <input type="text" id="buscador" placeholder="Buscar por nombre, contacto o teléfono…" oninput="filtrarTabla()">
-      </div>
-      <button class="btn-add" onclick="mostrarFormulario()">+ Agregar cliente</button>
-    </div>
-
-    <table id="tabla">
-      <thead>
-        <tr>
-          <th style="width:28%">Empresa</th>
-          <th style="width:16%">Ubicación</th>
-          <th style="width:18%">Teléfono</th>
-          <th style="width:28%">Contacto</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${filas}
-      </tbody>
-    </table>
-  `;
-}
-
-function filtrarTabla() {
-  const q = document.getElementById("buscador").value.toLowerCase();
-  const filas = document.querySelectorAll("#tabla tbody tr");
-  filas.forEach(function(fila) {
-    const texto = fila.textContent.toLowerCase();
-    fila.style.display = texto.includes(q) ? "" : "none";
-  });
-}
-
-function verRegistro(id, nombre, contacto, telefono, ubicacion) {
-
-  app.innerHTML = encabezado("Detalle del cliente") + `
-    <div class="panel">
-      <h2>${nombre}</h2>
-      <p><strong>Contacto:</strong> ${contacto}</p>
-      <p><strong>Teléfono:</strong> ${telefono}</p>
-      <p><strong>Ubicación:</strong> ${ubicacion}</p>
-
-      <div class="btn-row">
-        <button class="btn btn-primary" id="btnEditar">Editar</button>
-        <button class="btn btn-danger" id="btnEliminar">Eliminar</button>
-        <button class="btn btn-neutral" id="btnVolver">Volver</button>
-      </div>
-      <p class="estado-inline" id="estado"></p>
-    </div>
-  `;
-
-  document.getElementById("btnEditar").addEventListener("click", function() {
-    mostrarFormulario(id, nombre, contacto, telefono, ubicacion);
-  });
-
-  document.getElementById("btnEliminar").addEventListener("click", function() {
-    confirmarEliminar(id, nombre);
-  });
-
-  document.getElementById("btnVolver").addEventListener("click", function() {
-    cargarRegistros();
-  });
-}
-
-function confirmarEliminar(id, nombre) {
-
-  app.innerHTML = encabezado("Eliminar registro") + `
-    <div class="panel">
-      <h2>¿Eliminar este registro?</h2>
-      <p>${nombre}</p>
-
-      <div class="btn-row">
-        <button class="btn btn-danger" id="btnConfirmar">Sí, eliminar</button>
-        <button class="btn btn-neutral" id="btnCancelar">Cancelar</button>
-      </div>
-      <p class="estado-inline" id="estado"></p>
-    </div>
-  `;
-
-  document.getElementById("btnConfirmar").addEventListener("click", function() {
-    eliminarRegistro(id);
-  });
-
-  document.getElementById("btnCancelar").addEventListener("click", function() {
-    cargarRegistros();
-  });
-}
-
-function eliminarRegistro(id) {
-
-  const estado = document.getElementById("estado");
-  estado.textContent = "Eliminando...";
-
-  fetch(WORKER_URL + "?id=" + id, {
-    method: "DELETE"
-  })
-  .then(function(response) {
-    if (!response.ok) {
-      throw new Error("Error HTTP " + response.status);
+  function pintar(){
+    const t = norm(q.value.trim());
+    const res = clientes.filter(c =>
+      (zonaActiva==="Todos" || c.zona===zonaActiva) &&
+      (!t || norm(c.empresa+" "+c.contacto+" "+c.tel).includes(t))
+    );
+    lista.innerHTML = res.map(c=>{
+      const tel = enlaceTel(c.tel);
+      const mapaOk = /^https?:\/\//i.test(c.mapa);
+      return `
+      <li>
+        <button class="datos" data-id="${esc(c.id)}" aria-label="Editar ${esc(c.empresa)}">
+          <div class="empresa">${esc(c.empresa)}</div>
+          <div class="contacto">${esc(c.contacto)}</div>
+          <div class="telefono">${esc(c.tel)}</div>
+        </button>
+        <div class="acciones">
+          ${tel
+            ? `<a class="llamar" href="${tel}" aria-label="Llamar a ${esc(c.empresa)}">${iconoTel("#2A7A4B")}</a>`
+            : `<span class="apagado" title="Sin teléfono">${iconoTel("#A3ADB5")}</span>`}
+          ${mapaOk
+            ? `<a class="mapa" href="${esc(c.mapa)}" target="_blank" rel="noopener" aria-label="Cómo llegar a ${esc(c.empresa)}">${iconoMapa("#1B5E7B")}</a>`
+            : `<span class="apagado" title="Sin ubicación">${iconoMapa("#A3ADB5")}</span>`}
+        </div>
+      </li>`;
+    }).join("");
+    if(!res.length && clientes.length){
+      estado.className = "estado";
+      estado.style.display = "block";
+      estado.textContent = "No hay clientes con esa búsqueda.";
+    } else if(clientes.length){
+      estado.style.display = "none";
     }
-    return response.json();
-  })
-  .then(function(data) {
-    cargarRegistros();
-  })
-  .catch(function(error) {
-    estado.textContent = "Error al eliminar: " + error.message;
+    cuenta.textContent = res.length + (res.length===1 ? " cliente" : " clientes");
+  }
+
+  function avisar(texto){
+    const a = $("aviso");
+    a.textContent = texto;
+    a.classList.add("visible");
+    clearTimeout(avisar.t);
+    avisar.t = setTimeout(()=>a.classList.remove("visible"), 2400);
+  }
+
+  // ── Cuadro (agregar y editar) ────────────────────────────────
+  function llenarZonas(actual){
+    // Si el cliente tiene una zona que no está en la lista, se agrega para no borrarla sin querer
+    const opciones = ["", ...ZONAS];
+    if(actual && !ZONAS.includes(actual)) opciones.push(actual);
+    $("f-zona").innerHTML = opciones
+      .map(z => `<option value="${esc(z)}">${z ? esc(z) : "Sin zona"}</option>`).join("");
+    $("f-zona").value = actual || "";
+  }
+
+  function abrirCuadro(cliente){
+    form.reset();
+    editandoId = cliente ? cliente.id : null;
+    $("titulo").textContent = cliente ? "Editar cliente" : "Nuevo cliente";
+    guardarBtn.textContent = cliente ? "Guardar cambios" : "Guardar cliente";
+    $("f-empresa").value  = cliente ? cliente.empresa  : "";
+    $("f-contacto").value = cliente ? cliente.contacto : "";
+    $("f-tel").value      = cliente ? cliente.tel      : "";
+    $("f-mapa").value     = cliente ? cliente.mapa     : "";
+    llenarZonas(cliente ? cliente.zona : "");
+    msgError.style.display = "none";
+    guardarBtn.disabled = false;
+    $("eliminar").style.display = cliente ? "block" : "none";
+    $("confirmar").style.display = "none";
+    $("error-eliminar").style.display = "none";
+    $("si-eliminar").disabled = false;
+    $("si-eliminar").textContent = "Sí, eliminar";
+    form.style.display = "block";
+    velo.classList.add("abierto");
+    document.body.classList.add("bloqueado");
+    if(!cliente) setTimeout(()=>$("f-empresa").focus(), 50);
+  }
+  function cerrarCuadro(){
+    velo.classList.remove("abierto");
+    document.body.classList.remove("bloqueado");
+  }
+  function mostrarErrorForm(texto){
+    msgError.textContent = texto;
+    msgError.style.display = "block";
+  }
+
+  $("nuevo").onclick = () => abrirCuadro(null);
+  $("cerrar").onclick = cerrarCuadro;
+  velo.addEventListener("click", e => { if(e.target === velo) cerrarCuadro(); });
+
+  // ── Eliminar (con confirmación) ──────────────────────────────
+  $("eliminar").onclick = () => {
+    const c = clientes.find(x => x.id === editandoId);
+    if(!c) return;
+    $("confirmar-texto").textContent = "¿Eliminar a " + c.empresa + "?";
+    $("error-eliminar").style.display = "none";
+    form.style.display = "none";
+    $("confirmar").style.display = "block";
+  };
+  $("no-eliminar").onclick = () => {
+    $("confirmar").style.display = "none";
+    form.style.display = "block";
+  };
+  $("si-eliminar").onclick = async () => {
+    const btn = $("si-eliminar");
+    if(btn.disabled || !editandoId) return;      // evita tocar dos veces
+    btn.disabled = true;
+    btn.textContent = "Eliminando…";
+    $("error-eliminar").style.display = "none";
+    try{
+      const r = await fetch(API + "?id=" + encodeURIComponent(editandoId), { method:"DELETE" });
+      if(!r.ok) throw await leerError(r);
+      clientes = clientes.filter(c => c.id !== editandoId);
+      cerrarCuadro();
+      pintarFiltros();
+      pintar();
+      avisar("Cliente eliminado");
+    }catch(err){
+      $("error-eliminar").textContent = textoError(err, "guardar");
+      $("error-eliminar").style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Sí, eliminar";
+    }
+  };
+
+  // Tocar el nombre abre el cuadro con los datos del cliente
+  lista.addEventListener("click", e=>{
+    const b = e.target.closest(".datos");
+    if(!b) return;
+    const c = clientes.find(x => x.id === b.dataset.id);
+    if(c) abrirCuadro(c);
   });
-}
 
-function mostrarFormulario(id, nombre, contacto, telefono, ubicacion) {
+  form.addEventListener("submit", async e=>{
+    e.preventDefault();
+    if(guardarBtn.disabled) return;          // evita guardar dos veces
+    const empresa  = $("f-empresa").value.trim();
+    const contacto = $("f-contacto").value.trim();
+    const tel      = $("f-tel").value.trim();
+    const mapa     = $("f-mapa").value.trim();
+    const zona     = $("f-zona").value;
 
-  const esEdicion = !!id;
+    if(!empresa){ mostrarErrorForm("Escribe el nombre de la empresa."); return; }
+    if(!tel){ mostrarErrorForm("Escribe el teléfono."); return; }
+    if(mapa && !/^https?:\/\//i.test(mapa)){
+      mostrarErrorForm("La ubicación debe ser un enlace que empiece con https://"); return;
+    }
 
-  app.innerHTML = encabezado(esEdicion ? "Editar registro" : "Agregar registro") + `
-    <div class="panel">
-      <label>Nombre</label>
-      <input id="nombre" type="text" value="${escapar(nombre)}">
+    const fields = {};
+    let metodo, url;
 
-      <label>Contacto</label>
-      <input id="contacto" type="text" value="${escapar(contacto)}">
-
-      <label>Número de teléfono</label>
-      <input id="telefono" type="text" value="${escapar(telefono)}">
-
-      <label>Ubicación</label>
-      <input id="ubicacion" type="text" value="${escapar(ubicacion)}">
-
-      <div class="btn-row">
-        <button class="btn btn-primary" id="btnGuardar">Guardar</button>
-        <button class="btn btn-neutral" id="btnCancelar">Cancelar</button>
-      </div>
-      <p class="estado-inline" id="estado"></p>
-    </div>
-  `;
-
-  document.getElementById("btnGuardar").addEventListener("click", function() {
-    guardarRegistro(id);
-  });
-
-  document.getElementById("btnCancelar").addEventListener("click", function() {
-    cargarRegistros();
-  });
-}
-
-function guardarRegistro(id) {
-
-  const nombre = document.getElementById("nombre").value;
-  const contacto = document.getElementById("contacto").value;
-  const telefono = document.getElementById("telefono").value;
-  const ubicacion = document.getElementById("ubicacion").value;
-
-  const estado = document.getElementById("estado");
-  estado.textContent = "Guardando...";
-
-  const url = id ? WORKER_URL + "?id=" + id : WORKER_URL;
-  const metodo = id ? "PATCH" : "POST";
-
-  fetch(url, {
-    method: metodo,
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      fields: {
-        Nombre: nombre,
-        Contacto: contacto,
-        Telefono: telefono,
-        Ubicacion: ubicacion
+    if(editandoId){
+      // Editar: solo se envían los campos que cambiaron. Vaciar un campo lo borra (null).
+      const actual = clientes.find(x => x.id === editandoId);
+      if(empresa  !== actual.empresa)  fields[CAMPO.empresa]  = empresa;
+      if(contacto !== actual.contacto) fields[CAMPO.contacto] = contacto || null;
+      if(tel      !== actual.tel)      fields[CAMPO.tel]      = tel;
+      if(mapa     !== actual.mapa)     fields[CAMPO.mapa]     = mapa || null;
+      if(zona     !== actual.zona)     fields[CAMPO.zona]     = zona || null;
+      if(!Object.keys(fields).length){
+        cerrarCuadro();
+        avisar("No hubo cambios");
+        return;
       }
-    })
-  })
-  .then(function(response) {
-    if (!response.ok) {
-      throw new Error("Error HTTP " + response.status);
+      metodo = "PATCH";
+      url = API + "?id=" + encodeURIComponent(editandoId);
+    } else {
+      // Agregar: solo se envían los campos con contenido
+      fields[CAMPO.empresa] = empresa;
+      if(contacto) fields[CAMPO.contacto] = contacto;
+      fields[CAMPO.tel] = tel;
+      if(mapa) fields[CAMPO.mapa] = mapa;
+      if(zona) fields[CAMPO.zona] = zona;
+      metodo = "POST";
+      url = API;
     }
-    return response.json();
-  })
-  .then(function(data) {
-    cargarRegistros();
-  })
-  .catch(function(error) {
-    estado.textContent = "Error al guardar: " + error.message;
+
+    msgError.style.display = "none";
+    guardarBtn.disabled = true;
+    const textoBoton = guardarBtn.textContent;
+    guardarBtn.textContent = "Guardando…";
+    try{
+      const r = await fetch(url, {
+        method: metodo,
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({fields})
+      });
+      if(!r.ok) throw await leerError(r);
+      const nuevo = convertir(await r.json());
+      if(editandoId){
+        clientes = clientes.map(c => c.id === editandoId ? nuevo : c);
+      } else {
+        clientes.push(nuevo);
+      }
+      // La lista se actualiza aquí, sin volver a pedir todo a Airtable
+      ordenar();
+      cerrarCuadro();
+      pintarFiltros();
+      pintar();
+      avisar(editandoId ? "Cliente actualizado" : "Cliente agregado");
+    }catch(err){
+      mostrarErrorForm(textoError(err, "guardar"));
+      guardarBtn.disabled = false;
+      guardarBtn.textContent = textoBoton;
+    }
   });
-}
 
-cargarRegistros();
+  filtros.addEventListener("click", e=>{
+    const b = e.target.closest("button");
+    if(!b) return;
+    zonaActiva = b.dataset.z;
+    pintarFiltros(); pintar();
+  });
+  q.addEventListener("input", pintar);
 
+  cargar();
 </script>
-
 </body>
 </html>
