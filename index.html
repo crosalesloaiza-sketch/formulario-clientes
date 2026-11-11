@@ -32,7 +32,13 @@
     position:sticky;top:0;z-index:2;background:var(--fondo);
     padding:18px 16px 10px;border-bottom:1px solid var(--linea);
   }
+  .cab-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
   h1{font-size:24px;font-weight:700;letter-spacing:-.01em}
+  .btn-imprimir{
+    height:38px;padding:0 14px;border-radius:10px;border:0;background:var(--azul);color:#fff;
+    font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;flex:none;
+    display:flex;align-items:center;gap:6px;
+  }
   .cuenta{font-size:14px;color:var(--suave);margin-top:2px}
   .buscador{
     margin-top:12px;display:flex;align-items:center;gap:10px;
@@ -49,7 +55,7 @@
     font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer;font-family:inherit;
   }
   .filtros button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}
-  button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+  button:focus-visible,a:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--azul);outline-offset:2px}
 
   ul{list-style:none;background:var(--papel)}
   li{display:flex;align-items:center;gap:12px;padding:0 16px;border-bottom:1px solid var(--linea)}
@@ -60,12 +66,13 @@
   .empresa{font-size:17px;font-weight:650;line-height:1.25}
   .contacto{font-size:14px;color:var(--suave);margin-top:2px}
   .telefono{font-size:14px;margin-top:2px;font-variant-numeric:tabular-nums}
-  .acciones{display:flex;gap:10px;flex:none}
-  .acciones a,.acciones span{
-    width:46px;height:46px;border-radius:50%;
+  .acciones{display:flex;gap:8px;flex:none}
+  .acciones a,.acciones span,.acciones button{
+    width:46px;height:46px;border-radius:50%;border:0;padding:0;cursor:pointer;
     display:flex;align-items:center;justify-content:center;text-decoration:none;
   }
   .llamar{background-color:#DDF0E4;color:#2A7A4B}
+  .historial{background-color:#EEF1F7;color:#3B4A8A}
   .mapa{background-color:#DCEBF2;color:#1B5E7B}
   .apagado{background-color:#EEF0F2;color:#A3ADB5}
 
@@ -76,6 +83,10 @@
     margin-top:14px;height:44px;padding:0 20px;border-radius:12px;border:0;
     background:var(--azul);color:#fff;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;
   }
+
+  /* Pantalla de inicio de sesión */
+  .login{display:none;max-width:480px;margin:0 auto;padding:60px 16px}
+  .login h1{margin-bottom:8px}
 
   /* Botón flotante */
   .fab{
@@ -89,12 +100,13 @@
   }
   .fab:active{transform:scale(.95)}
 
-  /* Cuadro para agregar y editar */
+  /* Cuadros para agregar, editar, historial, nueva visita y reporte */
   .velo{
     position:fixed;top:0;left:0;right:0;bottom:0;background:#EEF2F5;z-index:10;
     display:none;overflow:auto;-webkit-overflow-scrolling:touch;
   }
   .velo.abierto{display:block}
+  #velo-visita{z-index:20}
   .cuadro{
     background:#FFFFFF;width:100%;max-width:480px;min-height:100%;margin:0 auto;
     padding:20px 16px 40px;
@@ -108,16 +120,18 @@
   }
   .campo{margin-top:12px}
   .campo label{display:block;font-size:14px;color:var(--suave);margin-bottom:6px}
-  .campo input,.campo select{
+  .campo input,.campo select,.campo textarea{
     -webkit-appearance:none;appearance:none;
-    width:100%;height:48px;border:1px solid #D9E1E7;border-radius:12px;
-    padding:0 12px;font-size:16px;font-family:inherit;color:#17262F;background-color:#FFFFFF;
+    width:100%;border:1px solid #D9E1E7;border-radius:12px;
+    font-size:16px;font-family:inherit;color:#17262F;background-color:#FFFFFF;
   }
+  .campo input,.campo select{height:48px;padding:0 12px}
+  .campo textarea{padding:12px;min-height:140px;resize:vertical}
   .campo select{
     padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235B6B76' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M6 9l6 6 6-6'/></svg>");
   }
-  .campo input:focus,.campo select:focus{outline:0;border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro)}
+  .campo input:focus,.campo select:focus,.campo textarea:focus{outline:0;border-color:var(--azul);box-shadow:0 0 0 3px var(--azul-claro)}
   .ayuda{font-size:13px;color:var(--suave);margin-top:6px}
   .msg-error{
     margin-top:14px;padding:12px;border-radius:12px;background:var(--rojo-claro);
@@ -127,6 +141,7 @@
     -webkit-appearance:none;appearance:none;
     width:100%;height:50px;margin-top:18px;border-radius:12px;border:0;
     background-color:#1B5E7B;color:#FFFFFF;font-size:16px;font-weight:650;font-family:inherit;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
   }
   .guardar:disabled{opacity:.6;cursor:default}
   .eliminar{
@@ -147,19 +162,93 @@
   .confirmar .btn-si{background-color:#B3261E;color:#FFFFFF}
   .confirmar button:disabled{opacity:.6;cursor:default}
 
+  /* Historial de visitas */
+  .hist-cliente{font-size:16px;font-weight:650;margin:6px 0 4px}
+  .hist-cab{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .hist-cab strong{font-size:14px}
+  .btn-visita{
+    height:38px;padding:0 16px;border-radius:10px;border:0;background:var(--azul);color:#fff;
+    font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;
+  }
+  .visita{padding:12px;margin-top:10px;background:#F6F8FA;border:1px solid var(--linea);border-radius:10px}
+  .visita-fecha{font-size:13px;font-weight:650;color:var(--azul)}
+  .visita-notas{font-size:15px;margin-top:4px;white-space:pre-wrap;word-wrap:break-word}
+  .vacio{font-size:14px;color:var(--suave);padding:14px 0}
+
+  /* Reporte entre fechas */
+  .fechas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .rep-titulo{font-size:16px;font-weight:650;margin:18px 0 6px}
+  .rep-dia{margin-top:16px}
+  .rep-fecha{font-size:15px;font-weight:650;color:var(--azul);padding-bottom:6px;border-bottom:2px solid var(--tinta)}
+  .rep-fecha span{font-size:13px;font-weight:400;color:var(--suave)}
+  .rep-lista{background:transparent}
+  .rep-lista li{display:block;padding:10px 0;border-bottom:1px solid var(--linea)}
+  .rep-notas{font-size:14px;color:var(--tinta);margin-top:3px;white-space:pre-wrap;word-wrap:break-word}
+  .rep-total{font-size:14px;color:var(--suave);margin-top:18px;text-align:right}
+
+  /* Hoja de llamada (Llamar o WhatsApp) */
+  .hoja-fondo{
+    position:fixed;inset:0;background:rgba(23,38,47,.35);z-index:30;
+    display:none;align-items:flex-end;justify-content:center;
+  }
+  .hoja-fondo.abierto{display:flex}
+  .hoja{
+    background:#FFFFFF;width:100%;max-width:480px;border-radius:16px 16px 0 0;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  .hoja-titulo{font-size:14px;color:var(--suave);text-align:center;margin-bottom:8px}
+  .hoja-op{
+    display:block;text-align:center;padding:16px;font-size:17px;font-weight:600;
+    color:var(--azul);text-decoration:none;border-top:1px solid var(--linea);
+  }
+  .hoja-cancel{
+    width:100%;height:50px;margin-top:10px;border-radius:12px;border:0;
+    background:var(--fondo);color:var(--tinta);font-size:17px;font-weight:600;
+    font-family:inherit;cursor:pointer;
+  }
+
   .aviso{
     position:fixed;left:50%;bottom:100px;transform:translateX(-50%);
     background:var(--tinta);color:#fff;font-size:15px;padding:12px 18px;border-radius:12px;
-    opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90%;text-align:center;
+    opacity:0;pointer-events:none;transition:opacity .2s;z-index:40;max-width:90%;text-align:center;
   }
   .aviso.visible{opacity:1}
   @media (prefers-reduced-motion:reduce){.aviso{transition:none}}
+
+  /* Impresión: solo se imprime el reporte */
+  @media print{
+    body{background:#fff;overflow:visible}
+    body > *:not(#velo-reporte){display:none !important}
+    #velo-reporte{display:block !important;position:static;background:#fff;overflow:visible}
+    #velo-reporte .cuadro{padding:0;min-height:0;max-width:none}
+    .no-print{display:none !important}
+    .rep-dia{break-inside:avoid}
+  }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- Pantalla de inicio de sesión -->
+<div class="login" id="login">
+  <h1>Clientes</h1>
+  <p class="cuenta">Inicia sesión para ver tus clientes.</p>
+  <form id="form-login" novalidate>
+    <div class="campo"><label for="l-correo">Correo</label><input id="l-correo" type="email" autocomplete="username"></div>
+    <div class="campo"><label for="l-clave">Contraseña</label><input id="l-clave" type="password" autocomplete="current-password"></div>
+    <div class="msg-error" id="msg-login" role="alert"></div>
+    <button type="submit" class="guardar" id="btn-login">Entrar</button>
+  </form>
+</div>
+
+<div class="app" id="app">
   <header>
-    <h1>Clientes</h1>
+    <div class="cab-top">
+      <h1>Clientes</h1>
+      <button type="button" class="btn-imprimir" id="btn-reporte" aria-label="Imprimir reporte de visitas">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir
+      </button>
+    </div>
     <p class="cuenta" id="cuenta">Cargando…</p>
     <label class="buscador">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -176,6 +265,7 @@
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
 </button>
 
+<!-- Cuadro de cliente -->
 <div class="velo" id="velo">
   <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="titulo">
     <div class="cuadro-cab">
@@ -213,21 +303,95 @@
   </div>
 </div>
 
+<!-- Cuadro de historial de visitas -->
+<div class="velo" id="velo-hist">
+  <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="hist-titulo">
+    <div class="cuadro-cab">
+      <h2 id="hist-titulo">Historial de visitas</h2>
+      <button type="button" class="cerrar" id="hist-cerrar" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="hist-cliente" id="hist-cliente"></p>
+    <div class="hist-cab">
+      <strong>Visitas</strong>
+      <button type="button" class="btn-visita" id="btn-nueva-visita">+ Visita</button>
+    </div>
+    <div id="hist-lista"></div>
+  </div>
+</div>
+
+<!-- Cuadro de nueva visita -->
+<div class="velo" id="velo-visita">
+  <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="visita-titulo">
+    <div class="cuadro-cab">
+      <h2 id="visita-titulo">Nueva visita</h2>
+      <button type="button" class="cerrar" id="visita-cerrar" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="hist-cliente" id="visita-cliente"></p>
+    <form id="form-visita" novalidate>
+      <div class="campo"><label for="v-fecha">Fecha</label><input id="v-fecha" type="date"></div>
+      <div class="campo"><label for="v-notas">Notas</label><textarea id="v-notas" placeholder="Qué se dejó, qué se mostró, pendientes…"></textarea></div>
+      <div class="msg-error" id="msg-visita" role="alert"></div>
+      <button type="submit" class="guardar" id="guardar-visita">Guardar visita</button>
+    </form>
+  </div>
+</div>
+
+<!-- Reporte de visitas entre fechas -->
+<div class="velo" id="velo-reporte">
+  <div class="cuadro" role="dialog" aria-modal="true" aria-labelledby="rep-titulo">
+    <div class="cuadro-cab no-print">
+      <h2 id="rep-titulo">Reporte de visitas</h2>
+      <button type="button" class="cerrar" id="rep-cerrar" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="no-print">
+      <div class="fechas">
+        <div class="campo"><label for="r-desde">Desde</label><input id="r-desde" type="date"></div>
+        <div class="campo"><label for="r-hasta">Hasta</label><input id="r-hasta" type="date"></div>
+      </div>
+      <div class="msg-error" id="rep-error" role="alert"></div>
+      <button type="button" class="guardar" id="rep-generar">Generar reporte</button>
+    </div>
+    <div id="rep-salida"></div>
+    <button type="button" class="guardar no-print" id="rep-imprimir" style="display:none">Imprimir este reporte</button>
+  </div>
+</div>
+
+<div class="hoja-fondo" id="hoja-fondo">
+  <div class="hoja" role="dialog" aria-modal="true" aria-labelledby="hoja-titulo">
+    <p class="hoja-titulo" id="hoja-titulo"></p>
+    <a class="hoja-op" id="hoja-llamar" href="#">Llamar</a>
+    <a class="hoja-op" id="hoja-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+    <button type="button" class="hoja-cancel" id="hoja-cerrar">Cancelar</button>
+  </div>
+</div>
+
 <div class="aviso" id="aviso" role="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   // ── Configuración ────────────────────────────────────────────
-  // URL de tu Worker. No lleva token: el Worker lo agrega desde sus secretos.
-  const API   = "https://airtable-proxy.crosalesloaiza.workers.dev";
-  // Nombres de los campos en Airtable (deben coincidir exactamente)
-  const CAMPO = {empresa:"Nombre", contacto:"Contacto", tel:"Telefono", mapa:"Ubicacion", zona:"Zona"};
-  // Opciones de Zona (deben ser iguales a las de Airtable, con tildes)
+  const SUPABASE_URL      = "https://xmgkqendalbsdkslshva.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhtZ2txZW5kYWxic2Rrc2xzaHZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAyOTE2NDMsImV4cCI6MjEwNTg2NzY0M30.UYA-7DQXamYEYD8p_1hE0gxZvB7rJ9HgQThqvGYgyQE";   // Project Settings → API → anon public
+  // Nombres de las columnas en Supabase
+  const CAMPO = {empresa:"empresa", contacto:"contacto", tel:"telefono", mapa:"ubicacion", zona:"zona"};
+  // Opciones de Zona (deben coincidir con el enum provincia de Supabase)
   const ZONAS = ["San José","Alajuela","Cartago","Heredia","Guanacaste","Puntarenas","Limón"];
   // ─────────────────────────────────────────────────────────────
 
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
   let clientes = [];
   let zonaActiva = "Todos";
-  let editandoId = null;   // null = agregando; con valor = editando ese registro
+  let editandoId = null;     // null = agregando; con valor = editando ese registro
+  let histReq = 0;           // evita que una respuesta vieja pise el historial actual
+  let histClienteId = null;  // cliente cuyo historial está abierto
+  let histClienteNombre = "";
 
   const $ = id => document.getElementById(id);
   const lista=$("lista"), cuenta=$("cuenta"), estado=$("estado"), q=$("q"), filtros=$("filtros");
@@ -235,74 +399,116 @@
 
   const iconoTel = c => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg>';
   const iconoMapa = c => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+  const iconoHistorial = c => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
 
   const norm = t => String(t||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
   const esc = t => String(t||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-  function enlaceTel(t){
+  // Devuelve solo dígitos con código de país (506 si son 8 dígitos)
+  function numeroLimpio(t){
     const d = String(t||"").replace(/\D/g,"");
     if(!d) return "";
-    if(d.length === 8) return "tel:+506" + d;
-    return "tel:+" + d;
+    if(d.length === 8) return "506" + d;
+    return d;
   }
 
-  function convertir(rec){
+  // De 2026-01-01 a 01-01-2026
+  function formatFecha(f){
+    if(!f) return "Sin fecha";
+    const [y,m,d] = String(f).split("-");
+    return `${d}-${m}-${y}`;
+  }
+
+  // Día de la semana en español, por ejemplo "Lunes"
+  function diaSemana(f){
+    const t = new Date(f + "T12:00:00").toLocaleDateString("es-CR", {weekday:"long"});
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
+  // Fecha de hoy en la hora local, en formato AAAA-MM-DD
+  function hoyLocal(){
+    const d = new Date();
+    return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  }
+
+  function convertir(row){
     return {
-      id: rec.id,
-      empresa: rec.fields[CAMPO.empresa] || "",
-      contacto: rec.fields[CAMPO.contacto] || "",
-      tel: rec.fields[CAMPO.tel] || "",
-      mapa: rec.fields[CAMPO.mapa] || "",
-      zona: rec.fields[CAMPO.zona] || ""
+      id: String(row.id),
+      empresa: row[CAMPO.empresa] || "",
+      contacto: row[CAMPO.contacto] || "",
+      tel: row[CAMPO.tel] || "",
+      mapa: row[CAMPO.mapa] || "",
+      zona: row[CAMPO.zona] || ""
     };
   }
   const ordenar = () => clientes.sort((a,b)=>a.empresa.localeCompare(b.empresa,"es"));
 
-  // Texto claro según el tipo de error
-  function textoError(e, accion){
-    if(e && e.status === 401) return "La conexión con la base no está autorizada. Revisa el token en el Worker.";
-    if(e && e.status === 403) return accion === "guardar"
-      ? "No hay permiso para escribir en la base. Revisa los permisos del token en Airtable."
-      : "No hay permiso para leer la base. Revisa los permisos del token en Airtable.";
-    if(e && e.status === 404) return accion === "guardar"
-      ? "No se encontró el registro. Puede que ese cliente ya no exista en Airtable."
-      : "No se encontró la base o la tabla. Revisa el ID de la base y el nombre de la tabla en el Worker.";
-    if(e && e.status === 422) return "Airtable no aceptó algún dato." + (e.detalle ? " " + e.detalle : "");
-    if(e && e.status === 429) return "Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.";
-    if(e && e.status) return "El servidor respondió con un error (" + e.status + ").";
-    return "No se pudo conectar. Revisa tu conexión a internet y la URL del Worker.";
+  // Texto claro según el error de Supabase
+  function textoError(e){
+    const msg = (e && e.message) || "";
+    if(e && e.code === "42501") return "No tienes permiso para esta acción. Revisa que hayas iniciado sesión.";
+    if(/Failed to fetch|NetworkError|network/i.test(msg)) return "No se pudo conectar. Revisa tu conexión a internet.";
+    if(e && e.code === "22P02") return "La zona no es válida. Revisa las opciones de Zona.";
+    if(e && e.code === "23502") return "Falta un dato obligatorio.";
+    return "Error: " + (msg || "desconocido");
   }
 
-  async function leerError(r){
-    let detalle = "";
-    try{ const j = await r.json(); detalle = (j.error && (j.error.message || j.error.type)) || ""; }catch(_){}
-    return {status:r.status, detalle};
+  // ── Sesión ───────────────────────────────────────────────────
+  async function iniciar(){
+    const { data: { session } } = await sb.auth.getSession();
+    if(session) mostrarApp(); else mostrarLogin();
   }
+  function mostrarLogin(){
+    $("login").style.display = "block";
+    $("app").style.display = "none";
+    $("nuevo").style.display = "none";
+  }
+  function mostrarApp(){
+    $("login").style.display = "none";
+    $("app").style.display = "";
+    $("nuevo").style.display = "";
+    cargar();
+  }
+
+  $("form-login").addEventListener("submit", async e=>{
+    e.preventDefault();
+    const btn = $("btn-login"), msg = $("msg-login");
+    msg.style.display = "none";
+    btn.disabled = true;
+    btn.textContent = "Entrando…";
+    const { error } = await sb.auth.signInWithPassword({
+      email: $("l-correo").value.trim(),
+      password: $("l-clave").value
+    });
+    if(error){
+      msg.textContent = /Invalid login/i.test(error.message)
+        ? "Correo o contraseña incorrectos."
+        : "No se pudo iniciar sesión: " + error.message;
+      msg.style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Entrar";
+      return;
+    }
+    btn.disabled = false;
+    btn.textContent = "Entrar";
+    mostrarApp();
+  });
 
   // ── Cargar ───────────────────────────────────────────────────
   async function cargar(){
     estado.className = "estado";
     estado.style.display = "block";
     estado.textContent = "Cargando clientes…";
-    let todos = [];
-    let offset = "";
-    try{
-      do{
-        const r = await fetch(API + "?pageSize=100" + (offset ? "&offset=" + encodeURIComponent(offset) : ""));
-        if(!r.ok) throw await leerError(r);
-        const j = await r.json();
-        todos = todos.concat(j.records);
-        offset = j.offset || "";
-      }while(offset);
-    }catch(e){
+    const { data, error } = await sb.from("clientes").select("*");
+    if(error){
       estado.className = "estado error";
-      estado.innerHTML = `<strong>No se pudieron cargar los clientes</strong>${esc(textoError(e,"leer"))}<br><button id="reintentar">Reintentar</button>`;
+      estado.innerHTML = `<strong>No se pudieron cargar los clientes</strong>${esc(textoError(error))}<br><button id="reintentar">Reintentar</button>`;
       $("reintentar").onclick = cargar;
       cuenta.textContent = "Sin datos";
       lista.innerHTML = "";
       return;
     }
-    clientes = todos.map(convertir);
+    clientes = data.map(convertir);
     ordenar();
     estado.style.display = "none";
     pintarFiltros();
@@ -323,7 +529,7 @@
       (!t || norm(c.empresa+" "+c.contacto+" "+c.tel).includes(t))
     );
     lista.innerHTML = res.map(c=>{
-      const tel = enlaceTel(c.tel);
+      const num = numeroLimpio(c.tel);
       const mapaOk = /^https?:\/\//i.test(c.mapa);
       return `
       <li>
@@ -333,9 +539,10 @@
           <div class="telefono">${esc(c.tel)}</div>
         </button>
         <div class="acciones">
-          ${tel
-            ? `<a class="llamar" href="${tel}" aria-label="Llamar a ${esc(c.empresa)}">${iconoTel("#2A7A4B")}</a>`
+          ${num
+            ? `<button type="button" class="llamar" data-num="${esc(num)}" data-nombre="${esc(c.empresa)}" aria-label="Llamar a ${esc(c.empresa)}">${iconoTel("#2A7A4B")}</button>`
             : `<span class="apagado" title="Sin teléfono">${iconoTel("#A3ADB5")}</span>`}
+          <button type="button" class="historial" data-id="${esc(c.id)}" data-nombre="${esc(c.empresa)}" aria-label="Ver visitas de ${esc(c.empresa)}">${iconoHistorial("#3B4A8A")}</button>
           ${mapaOk
             ? `<a class="mapa" href="${esc(c.mapa)}" target="_blank" rel="noopener" aria-label="Cómo llegar a ${esc(c.empresa)}">${iconoMapa("#1B5E7B")}</a>`
             : `<span class="apagado" title="Sin ubicación">${iconoMapa("#A3ADB5")}</span>`}
@@ -359,6 +566,204 @@
     clearTimeout(avisar.t);
     avisar.t = setTimeout(()=>a.classList.remove("visible"), 2400);
   }
+
+  // ── Hoja de llamada (Llamar o WhatsApp) ──────────────────────
+  function abrirHoja(num, nombre){
+    $("hoja-titulo").textContent = nombre;
+    $("hoja-llamar").href = "tel:+" + num;
+    $("hoja-wa").href = "https://wa.me/" + num;
+    $("hoja-fondo").classList.add("abierto");
+  }
+  function cerrarHoja(){
+    $("hoja-fondo").classList.remove("abierto");
+  }
+  $("hoja-cerrar").onclick = cerrarHoja;
+  $("hoja-fondo").addEventListener("click", e => { if(e.target.id === "hoja-fondo") cerrarHoja(); });
+  $("hoja-llamar").addEventListener("click", cerrarHoja);
+  $("hoja-wa").addEventListener("click", cerrarHoja);
+
+  // ── Historial de visitas ─────────────────────────────────────
+  async function abrirHistorial(clienteId, nombre){
+    const req = ++histReq;
+    histClienteId = clienteId;
+    histClienteNombre = nombre;
+    $("hist-cliente").textContent = nombre;
+    $("hist-lista").innerHTML = '<p class="vacio">Cargando visitas…</p>';
+    $("velo-hist").classList.add("abierto");
+    document.body.classList.add("bloqueado");
+
+    const { data, error } = await sb.from("visitas")
+      .select("fecha, notas")
+      .eq("cliente_id", Number(clienteId))
+      .order("fecha", { ascending: false });
+
+    if(req !== histReq) return;   // se abrió otro historial mientras esperábamos
+
+    if(error){
+      $("hist-lista").innerHTML = `<div class="msg-error" style="display:block">${esc(textoError(error))}</div>`;
+      return;
+    }
+    if(!data.length){
+      $("hist-lista").innerHTML = '<p class="vacio">Sin visitas registradas.</p>';
+      return;
+    }
+    $("hist-lista").innerHTML = data.map(v => `
+      <div class="visita">
+        <div class="visita-fecha">${esc(formatFecha(v.fecha))}</div>
+        <div class="visita-notas">${esc(v.notas) || "Sin notas"}</div>
+      </div>`).join("");
+  }
+  function cerrarHistorial(){
+    histReq++;   // descarta cualquier respuesta pendiente
+    histClienteId = null;
+    $("velo-hist").classList.remove("abierto");
+    document.body.classList.remove("bloqueado");
+  }
+  $("hist-cerrar").onclick = cerrarHistorial;
+  $("velo-hist").addEventListener("click", e => { if(e.target.id === "velo-hist") cerrarHistorial(); });
+
+  // ── Nueva visita ─────────────────────────────────────────────
+  function abrirFormVisita(){
+    if(!histClienteId) return;
+    $("visita-cliente").textContent = histClienteNombre;
+    $("v-fecha").value = hoyLocal();
+    $("v-notas").value = "";
+    $("msg-visita").style.display = "none";
+    $("guardar-visita").disabled = false;
+    $("guardar-visita").textContent = "Guardar visita";
+    $("velo-visita").classList.add("abierto");
+    setTimeout(()=>$("v-notas").focus(), 50);
+  }
+  function cerrarFormVisita(){
+    $("velo-visita").classList.remove("abierto");
+  }
+  function mostrarErrorVisita(texto){
+    $("msg-visita").textContent = texto;
+    $("msg-visita").style.display = "block";
+  }
+
+  $("btn-nueva-visita").onclick = abrirFormVisita;
+  $("visita-cerrar").onclick = cerrarFormVisita;
+  $("velo-visita").addEventListener("click", e => { if(e.target.id === "velo-visita") cerrarFormVisita(); });
+
+  $("form-visita").addEventListener("submit", async e=>{
+    e.preventDefault();
+    const btn = $("guardar-visita");
+    if(btn.disabled) return;
+    const fecha = $("v-fecha").value;
+    const notas = $("v-notas").value.trim();
+    if(!fecha){ mostrarErrorVisita("Elige la fecha de la visita."); return; }
+
+    btn.disabled = true;
+    btn.textContent = "Guardando…";
+    $("msg-visita").style.display = "none";
+
+    const { error } = await sb.from("visitas").insert({
+      cliente_id: Number(histClienteId),
+      fecha,
+      notas: notas || null
+    });
+
+    btn.disabled = false;
+    btn.textContent = "Guardar visita";
+    if(error){
+      mostrarErrorVisita(textoError(error));
+      return;
+    }
+    cerrarFormVisita();
+    avisar("Visita guardada");
+    abrirHistorial(histClienteId, histClienteNombre);   // recarga el historial con la visita nueva
+  });
+
+  // ── Reporte de visitas entre fechas ──────────────────────────
+  function abrirReporte(){
+    const hoy = hoyLocal();
+    if(!$("r-desde").value) $("r-desde").value = hoy.slice(0,8) + "01";   // primer día del mes
+    if(!$("r-hasta").value) $("r-hasta").value = hoy;
+    $("velo-reporte").classList.add("abierto");
+    document.body.classList.add("bloqueado");
+  }
+  function cerrarReporte(){
+    $("velo-reporte").classList.remove("abierto");
+    document.body.classList.remove("bloqueado");
+  }
+  function mostrarErrorReporte(texto){
+    $("rep-error").textContent = texto;
+    $("rep-error").style.display = "block";
+  }
+
+  async function generarReporte(){
+    const desde = $("r-desde").value;
+    const hasta = $("r-hasta").value;
+    $("rep-error").style.display = "none";
+    if(!desde || !hasta){ mostrarErrorReporte("Elige las dos fechas."); return; }
+    if(desde > hasta){ mostrarErrorReporte("La fecha inicial es posterior a la final."); return; }
+
+    const btn = $("rep-generar");
+    btn.disabled = true;
+    btn.textContent = "Generando…";
+
+    const { data, error } = await sb.from("visitas")
+      .select("fecha, notas, clientes(empresa)")
+      .gte("fecha", desde)
+      .lte("fecha", hasta)
+      .order("fecha", { ascending: true });
+
+    btn.disabled = false;
+    btn.textContent = "Generar reporte";
+
+    if(error){
+      mostrarErrorReporte(textoError(error));
+      return;
+    }
+    pintarReporte(data, desde, hasta);
+  }
+
+  function pintarReporte(data, desde, hasta){
+    const salida = $("rep-salida");
+    if(!data.length){
+      salida.innerHTML = `<p class="rep-titulo">Visitas del ${esc(formatFecha(desde))} al ${esc(formatFecha(hasta))}</p>
+        <p class="vacio">No hay visitas en ese rango.</p>`;
+      $("rep-imprimir").style.display = "none";
+      return;
+    }
+
+    // Agrupa las visitas por día
+    const porDia = {};
+    data.forEach(v => {
+      const cli = Array.isArray(v.clientes) ? v.clientes[0] : v.clientes;
+      const empresa = (cli && cli.empresa) || "Cliente eliminado";
+      if(!porDia[v.fecha]) porDia[v.fecha] = [];
+      porDia[v.fecha].push({ empresa, notas: v.notas || "" });
+    });
+    const dias = Object.keys(porDia).sort();
+
+    salida.innerHTML =
+      `<div class="rep-titulo">Visitas del ${esc(formatFecha(desde))} al ${esc(formatFecha(hasta))}</div>` +
+      dias.map(d => {
+        const items = porDia[d].sort((a,b)=>a.empresa.localeCompare(b.empresa,"es"));
+        return `
+        <div class="rep-dia">
+          <div class="rep-fecha">${esc(diaSemana(d))} ${esc(formatFecha(d))} <span>(${items.length} ${items.length===1 ? "visita" : "visitas"})</span></div>
+          <ul class="rep-lista">
+            ${items.map(i => `
+              <li>
+                <strong>${esc(i.empresa)}</strong>
+                <div class="rep-notas">${esc(i.notas) || "Sin notas"}</div>
+              </li>`).join("")}
+          </ul>
+        </div>`;
+      }).join("") +
+      `<p class="rep-total">Total: ${data.length} ${data.length===1 ? "visita" : "visitas"} en ${dias.length} ${dias.length===1 ? "día" : "días"}</p>`;
+
+    $("rep-imprimir").style.display = "flex";
+  }
+
+  $("btn-reporte").onclick = abrirReporte;
+  $("rep-cerrar").onclick = cerrarReporte;
+  $("rep-generar").onclick = generarReporte;
+  $("rep-imprimir").onclick = () => window.print();
+  $("velo-reporte").addEventListener("click", e => { if(e.target.id === "velo-reporte") cerrarReporte(); });
 
   // ── Cuadro (agregar y editar) ────────────────────────────────
   function llenarZonas(actual){
@@ -424,30 +829,36 @@
     btn.disabled = true;
     btn.textContent = "Eliminando…";
     $("error-eliminar").style.display = "none";
-    try{
-      const r = await fetch(API + "?id=" + encodeURIComponent(editandoId), { method:"DELETE" });
-      if(!r.ok) throw await leerError(r);
-      clientes = clientes.filter(c => c.id !== editandoId);
-      cerrarCuadro();
-      pintarFiltros();
-      pintar();
-      avisar("Cliente eliminado");
-    }catch(err){
-      $("error-eliminar").textContent = textoError(err, "guardar");
+    const { error } = await sb.from("clientes").delete().eq("id", editandoId);
+    if(error){
+      $("error-eliminar").textContent = textoError(error);
       $("error-eliminar").style.display = "block";
       btn.disabled = false;
       btn.textContent = "Sí, eliminar";
+      return;
     }
+    clientes = clientes.filter(c => c.id !== editandoId);
+    cerrarCuadro();
+    pintarFiltros();
+    pintar();
+    avisar("Cliente eliminado");
   };
 
-  // Tocar el nombre abre el cuadro con los datos del cliente
+  // Icono de teléfono: hoja de llamada. Icono de reloj: historial. Nombre: editar.
   lista.addEventListener("click", e=>{
+    const llamar = e.target.closest(".llamar");
+    if(llamar){ abrirHoja(llamar.dataset.num, llamar.dataset.nombre); return; }
+
+    const hist = e.target.closest(".historial");
+    if(hist){ abrirHistorial(hist.dataset.id, hist.dataset.nombre); return; }
+
     const b = e.target.closest(".datos");
     if(!b) return;
     const c = clientes.find(x => x.id === b.dataset.id);
     if(c) abrirCuadro(c);
   });
 
+  // ── Guardar cliente (agregar y editar) ───────────────────────
   form.addEventListener("submit", async e=>{
     e.preventDefault();
     if(guardarBtn.disabled) return;          // evita guardar dos veces
@@ -464,10 +875,15 @@
     }
 
     const fields = {};
-    let metodo, url;
+    let resultado;
+
+    msgError.style.display = "none";
+    guardarBtn.disabled = true;
+    const textoBoton = guardarBtn.textContent;
+    guardarBtn.textContent = "Guardando…";
 
     if(editandoId){
-      // Editar: solo se envían los campos que cambiaron. Vaciar un campo lo borra (null).
+      // Editar: solo se envían los campos que cambiaron. Vaciar un campo lo deja en null.
       const actual = clientes.find(x => x.id === editandoId);
       if(empresa  !== actual.empresa)  fields[CAMPO.empresa]  = empresa;
       if(contacto !== actual.contacto) fields[CAMPO.contacto] = contacto || null;
@@ -475,12 +891,13 @@
       if(mapa     !== actual.mapa)     fields[CAMPO.mapa]     = mapa || null;
       if(zona     !== actual.zona)     fields[CAMPO.zona]     = zona || null;
       if(!Object.keys(fields).length){
+        guardarBtn.disabled = false;
+        guardarBtn.textContent = textoBoton;
         cerrarCuadro();
         avisar("No hubo cambios");
         return;
       }
-      metodo = "PATCH";
-      url = API + "?id=" + encodeURIComponent(editandoId);
+      resultado = await sb.from("clientes").update(fields).eq("id", editandoId).select().single();
     } else {
       // Agregar: solo se envían los campos con contenido
       fields[CAMPO.empresa] = empresa;
@@ -488,38 +905,29 @@
       fields[CAMPO.tel] = tel;
       if(mapa) fields[CAMPO.mapa] = mapa;
       if(zona) fields[CAMPO.zona] = zona;
-      metodo = "POST";
-      url = API;
+      resultado = await sb.from("clientes").insert(fields).select().single();
     }
 
-    msgError.style.display = "none";
-    guardarBtn.disabled = true;
-    const textoBoton = guardarBtn.textContent;
-    guardarBtn.textContent = "Guardando…";
-    try{
-      const r = await fetch(url, {
-        method: metodo,
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({fields})
-      });
-      if(!r.ok) throw await leerError(r);
-      const nuevo = convertir(await r.json());
-      if(editandoId){
-        clientes = clientes.map(c => c.id === editandoId ? nuevo : c);
-      } else {
-        clientes.push(nuevo);
-      }
-      // La lista se actualiza aquí, sin volver a pedir todo a Airtable
-      ordenar();
-      cerrarCuadro();
-      pintarFiltros();
-      pintar();
-      avisar(editandoId ? "Cliente actualizado" : "Cliente agregado");
-    }catch(err){
-      mostrarErrorForm(textoError(err, "guardar"));
+    if(resultado.error){
+      mostrarErrorForm(textoError(resultado.error));
       guardarBtn.disabled = false;
       guardarBtn.textContent = textoBoton;
+      return;
     }
+
+    const nuevo = convertir(resultado.data);
+    if(editandoId){
+      clientes = clientes.map(c => c.id === editandoId ? nuevo : c);
+    } else {
+      clientes.push(nuevo);
+    }
+    ordenar();
+    guardarBtn.disabled = false;
+    guardarBtn.textContent = textoBoton;
+    cerrarCuadro();
+    pintarFiltros();
+    pintar();
+    avisar(editandoId ? "Cliente actualizado" : "Cliente agregado");
   });
 
   filtros.addEventListener("click", e=>{
@@ -530,7 +938,7 @@
   });
   q.addEventListener("input", pintar);
 
-  cargar();
+  iniciar();
 </script>
 </body>
 </html>
